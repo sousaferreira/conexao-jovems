@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Organize - Meu Organizador</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <script src="script.js"></script>
+     <link rel="shortcut icon" href="images/planejador.png" type="image/x-icon">
+    <style>
+        /* Estilos para a garrafinha de água */
+        #waterBottle {
+            width: 80px;
+            height: 200px;
+            background: #e0f7fa;
+            border: 2px solid #00796b;
+            border-radius: 10px;
+            position: relative;
+            margin: 20px auto;
+        }
+        #waterLevel {
+            background: #00796b;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            border-radius: 10px 10px 0 0;
+            transition: height 0.3s;
+        }
+
+        /* Estilos adicionais */
+        header.major h1 {
+            margin-bottom: 10px;
+            font-size: 24px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="is-preload">
+
+<!-- Wrapper -->
+<div id="wrapper">
+
+    <!-- Header -->
+    <header id="header">
+        <a href="index.html" class="logo"><strong>Meu Organizador</strong></a>
+        <nav>
+            <a href="#menu">Menu</a>
+        </nav>
+    </header>
+
+    <!-- Menu -->
+    <nav id="menu">
+        <ul class="links">
+            <li><a href="index.html">Início</a></li>
+            <li><a href="#notes">Notas</a></li>
+            <li><a href="#water-reminder">Lembrete de Água</a></li>
+        </ul>
+        <ul class="actions stacked">
+            <li><a href="#" class="button primary fit">Começar</a></li>
+            <li><a href="#" class="button fit">Entrar</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main -->
+    <div id="main" class="alt">
+        
+       <div class="calendar">
+        <div class="calendar__picture">
+            <h2 id="calendarHeader"></h2>
+            <h3 id="calendarMonth"></h3>
+        </div>
+        <div class="calendar__date">
+            <div class="calendar__day">M</div>
+            <div class="calendar__day">T</div>
+            <div class="calendar__day">W</div>
+            <div class="calendar__day">T</div>
+            <div class="calendar__day">F</div>
+            <div class="calendar__day">S</div>
+            <div class="calendar__day">S</div>
+            
+            <!-- Os números do calendário serão gerados pelo JavaScript -->
+            <div id="calendarDays" class="calendar__days"></div>
+        </div>
+    </div>
+    
+        <!-- Notes Section -->
+        <section id="notes">
+            <div class="inner">
+                <header class="major">
+                    <h1>Notas</h1>
+                </header>
+                <form id="notesForm">
+                    <div class="fields">
+                        <div class="field">
+                            <label for="note">Sua Nota</label>
+                            <textarea name="note" id="note" rows="6"></textarea>
+                        </div>
+                    </div>
+                    <ul class="actions">
+                        <li><input type="submit" value="Adicionar Nota" class="primary" /></li>
+                    </ul>
+                </form>
+                <div id="notesList"></div>
+            </div>
+        </section>
+
+        <!-- Water Reminder Section -->
+        <section id="water-reminder">
+            <div class="inner">
+                <header class="major">
+                    <h1>Lembrete de Água</h1>
+                </header>
+
+                <!-- Garrafinha de Água -->
+                <div style="text-align: center;">
+                    <div id="waterBottle">
+                        <div id="waterLevel"></div>
+                    </div>
+                    <div id="starContainer">
+                        <span id="starDisplay"></span>
+                    </div>
+                </div>
+                <p>Volume consumido: <span id="waterAmount">0</span> L</p>
+                <button onclick="drinkWater()">Beber Água</button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <div class="inner">
+            <ul class="icons">
+                <li><a href="#" class="icon brands alt fa-twitter"><span class="label">Twitter</span></a></li>
+                <li><a href="#" class="icon brands alt fa-facebook-f"><span class="label">Facebook</span></a></li>
+                <li><a href="#" class="icon brands alt fa-instagram"><span class="label">Instagram</span></a></li>
+                <li><a href="#" class="icon brands alt fa-github"><span class="label">GitHub</span></a></li>
+                <li><a href="#" class="icon brands alt fa-linkedin-in"><span class="label">LinkedIn</span></a></li>
+            </ul>
+            <ul class="copyright">
+                <li>&copy; Meu Organizador</li><li>Design: <a href="https://html5up.net">HTML5 UP</a></li>
+            </ul>
+        </div>
+    </footer>
+
+</div>
+
+<!-- Scripts -->
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+    let totalWater = 0; // Total de água consumida
+    const dailyGoal = 2; // Meta diária de 2 litros
+
+    function drinkWater() {
+        totalWater += 0.2; // Cada clique representa 200ml
+        document.getElementById("waterAmount").innerText = totalWater.toFixed(1);
+        
+        // Atualiza o nível da garrafinha
+        const waterLevel = document.getElementById("waterLevel");
+        const height = (totalWater / dailyGoal) * 100; // Percentagem do total
+        waterLevel.style.height = Math.min(height, 100) + "%"; // Garante que o nível não ultrapasse 100%
+
+        // Verifica se a meta foi atingida
+        if (totalWater >= dailyGoal) {
+            alert("Parabéns! Você atingiu sua meta de 2 litros hoje!");
+            addStarToDisplay();
+            resetWaterTracking();
+        }
+    }
+
+    function addStarToDisplay() {
+        const starDisplay = document.getElementById("starDisplay");
+        starDisplay.innerHTML += "★"; // Adiciona uma estrela
+    }
+
+    function resetWaterTracking() {
+        totalWater = 0;
+        document.getElementById("waterAmount").innerText = totalWater.toFixed(1);
+        document.getElementById("waterLevel").style.height = "0%";
+    }
+
+    document.getElementById('notesForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const note = document.getElementById("note").value;
+        const notesList = document.getElementById("notesList");
+        const newNote = document.createElement('div');
+        newNote.innerHTML = `<p>${note} <button onclick="this.parentElement.remove()">Feito</button></p>`;
+        notesList.appendChild(newNote);
+        document.getElementById("note").value = ''; // Limpar o campo
+    });
+</script>
+
+</body>
+</html>

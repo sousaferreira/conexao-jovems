@@ -1,0 +1,174 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Diário</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <script src="server.js"></script>
+    <link rel="shortcut icon" href="images/diario.png" type="image/x-icon">
+	<link rel="stylesheet" href="assets/css/main.css" />
+</head>
+<body>
+
+    <!-- Wrapper -->
+    <div id="wrapper">
+
+        <!-- Header -->
+        <header id="header">
+            <a href="#" class="logo"><strong>Meu Diário</strong></a>
+        </header>
+
+        <!-- Main -->
+        <div id="main">
+
+            <!-- Formulário de entrada do diário -->
+            <section class="diario" id="diary-entry">
+                <div class="inner">
+                    <header>
+                        <h2>Como foi o seu dia?</h2>
+                    </header>
+                    <form id="entryForm">
+                        <div>
+                            <label for="title">Título</label>
+                            <input type="text" name="title" id="title" required />
+                        </div>
+                        <div>
+                            <label for="entry">Como está se sentindo?</label>
+                            <textarea name="entry" id="entry" rows="6" required></textarea>
+                        </div>
+                        <button type="submit">Salvar Entrada</button>
+                    </form>
+                </div>
+                <div class="inner">
+                    <header>
+                        <h2>págians Anteriores</h2>
+                    </header>
+                    <div id="entries-list">
+                        <p>Sem nada ainda.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Entradas anteriores -->
+            
+                
+           
+
+        </div>
+
+        <!-- Footer -->
+        <footer id="footer">
+            <div class="inner">
+                <p>&copy; Meu Diário</p>
+            </div>
+        </footer>
+
+    </div>
+
+
+    <script>
+		document.getElementById('entryForm').addEventListener('submit', function(event) {
+			event.preventDefault();
+		
+			const title = document.getElementById('title').value;
+			const entry = document.getElementById('entry').value;
+		
+			fetch('http://localhost:3000/entries', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ title, entry, date: new Date() })
+			})
+			.then(() => {
+				this.reset();
+				alert('Entrada salva!');
+				loadEntries(); // Atualiza a lista
+			});
+		});
+		
+		function loadEntries() {
+			fetch('http://localhost:3000/entries')
+			.then(response => response.json())
+			.then(entries => {
+				const entriesList = document.getElementById('entries-list');
+				entriesList.innerHTML = '';
+		
+				if (entries.length === 0) {
+					entriesList.innerHTML = '<p>Sem entradas ainda.</p>';
+				} else {
+					entries.forEach((entry, index) => {
+						const entryDiv = document.createElement('div');
+						entryDiv.innerHTML = `<strong>${entry.title}</strong><p>${entry.entry}</p><small>${new Date(entry.date).toLocaleString()}</small><button onclick="deleteEntry(${index})">Deletar</button>`;
+						entriesList.appendChild(entryDiv);
+					});
+				}
+			});
+		}
+		
+		function deleteEntry(index) {
+			fetch(`http://localhost:3000/entries/${index}`, {
+				method: 'DELETE'
+			})
+			.then(() => {
+				loadEntries(); // Atualiza a lista
+			});
+		}
+		
+		// Carrega as entradas ao abrir a página
+		window.onload = loadEntries;
+		</script>
+		
+    <script>
+		
+        // Carrega entradas do Local Storage
+        function loadEntries() {
+            const entries = JSON.parse(localStorage.getItem('diaryEntries')) || [];
+            const entriesList = document.getElementById('entries-list');
+            entriesList.innerHTML = ''; // Limpa a lista existente
+
+            if (entries.length === 0) {
+                entriesList.innerHTML = '<p>Sem entradas ainda.</p>';
+            } else {
+                entries.forEach((entry, index) => {
+                    const entryDiv = document.createElement('div');
+                    entryDiv.innerHTML = `<strong>${entry.title}</strong><p>${entry.entry}</p><small>${new Date(entry.date).toLocaleString()}</small><button onclick="deleteEntry(${index})">Deletar</button>`;
+                    entriesList.appendChild(entryDiv);
+                });
+            }
+        }
+
+        // Adiciona uma nova entrada
+        document.getElementById('entryForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Evita o envio do formulário
+
+            const title = document.getElementById('title').value;
+            const entry = document.getElementById('entry').value;
+
+            // Recupera entradas existentes ou cria uma nova lista
+            const entries = JSON.parse(localStorage.getItem('diaryEntries')) || [];
+            entries.push({ title, entry, date: new Date() });
+
+            // Salva no Local Storage
+            localStorage.setItem('diaryEntries', JSON.stringify(entries));
+
+            // Limpa o formulário
+            this.reset();
+            alert('Entrada salva!');
+            loadEntries(); // Atualiza a lista
+        });
+
+        // Deleta uma entrada
+        function deleteEntry(index) {
+            const entries = JSON.parse(localStorage.getItem('diaryEntries')) || [];
+            entries.splice(index, 1);
+            localStorage.setItem('diaryEntries', JSON.stringify(entries));
+            loadEntries(); // Atualiza a lista
+        }
+
+        // Carrega as entradas ao abrir a página
+        window.onload = loadEntries;
+    </script>
+
+</body>
+</html>
